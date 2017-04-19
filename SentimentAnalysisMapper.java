@@ -20,3 +20,4 @@ public class SalesTestMapper extends Mapper<LongWritable, Text, Text, Text> {
       }
    }
 }
+//testing push
