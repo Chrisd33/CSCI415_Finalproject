@@ -26,17 +26,22 @@ public class fileHasher {
      * @return A hashtable, where the key is the hashed value of the line, and $
      * @throws IOException File not existant? Whoops.
      */
-    public static Hashtable fileToHashTable(String filePath) throws IOException$
-        Hashtable table = new Hashtable();
+
+    public static Hashtable fileToHashTable(String filePath) throws IOException {
+        Hashtable<Integer, Double> table = new Hashtable<Integer, Double>();
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line = reader.readLine();
-        while (line != null) {
-            table.put(line.hashCode(), line);
-            try {
-                line = reader.readLine();
-            } catch (Exception e) {
-                System.out.println("Failure reading a line (addFromReaderToTabl$
-            }
+
+        while(line != null)
+        {
+            String[] split = line.split("\t");
+            String word = split[0].substring(0,split[0].length() - 2);
+            Double score = Double.parseDouble(split[1]);
+
+            int hashCode = word.hashCode();
+
+            table.put(hashCode, score);
+            line = reader.readLine();
         }
         return table;
     }

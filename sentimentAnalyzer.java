@@ -12,12 +12,11 @@ public class sentimentAnalyzer
      * languageProcessing.sentimentAnalyzer constructor that hashes
      * @throws IOException File is missing
      */
-    public sentimentAnalyzer() throws IOException {
-        String filePath = "sentiwords.txt";
+        public sentimentAnalyzer() throws IOException {
+        String filePath = "assets/sentiwords.txt";
         wordList = fileHasher.fileToHashTable(filePath);
         System.out.println("Tables done hashing");
     }
-
     /**
      *Takes a string, takes outz
      * @param str String to analyze
@@ -26,7 +25,7 @@ public class sentimentAnalyzer
     public double analyzeString(String str)
     {
         double stringScore = 0;
-        String[] strArr = str.replaceAll("[^a-zA-Z ]", "").toLowerCase().split($
+        String[] strArr = str.replaceAll("[^a-zA-Z ]", "").toLowerCase().split(" ");
         for(String segment : strArr)
         {
             int hashedSeg = segment.hashCode();
