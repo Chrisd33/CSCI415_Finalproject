@@ -13,7 +13,7 @@ public class sentimentAnalyzer
      * @throws IOException File is missing
      */
         public sentimentAnalyzer() throws IOException {
-        String filePath = "assets/sentiwords.txt";
+        String filePath = "sentiwords.txt";
         wordList = fileHasher.fileToHashTable(filePath);
         System.out.println("Tables done hashing");
     }
