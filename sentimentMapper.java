@@ -15,7 +15,7 @@ public class sentimentMapper extends Mapper<LongWritable, Text, Text, Text> {
       String twitterId = fields[0];
       String tweet = fields[0];
 
-      context.write(new Text(twitterId), new Text(tweet));
+      context.write(new Text(tweet), new Text(twitterId));
    }
 }
 

@@ -13,20 +13,20 @@ import java.io.*;
 
 
 public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
-    BigDecimal runningTotal = new BigDecimal(0.0);
+    double runningTotal = 0.0;
     int numTweets = 0;
     Hashtable sentiTable = new Hashtable();
 
    @Override
-    public void setup(Context context) throws IOException {
-        Path pt = new Path("hdfs:/user/jkunze/sentiwords.txt");
+    protected void setup(Context context) throws IOException, InterruptedException {
+        Path pt = new Path("/user/jkunze/sentiwords.txt");
         FileSystem fs = FileSystem.get(new Configuration());
         BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
-        String line = br.readLine();
+	String line = br.readLine();
         while (line!=null) {
             String[] split =  line.split("\t");
-            String word = split[0].substring(0, split[0].length() - 2);
-            Double score = Double.parseDouble(split[1]);
+            String word = split[0].substring(0,split[0].length()-2);
+            double score = Double.parseDouble(split[1]);
             int hashCode = word.hashCode();
             sentiTable.put(hashCode, score);
             line = br.readLine();
@@ -36,20 +36,18 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
     @Override
     public void reduce(Text key, Iterable < Text > values, Context context) throws IOException,
     InterruptedException {
-        BigDecimal totalScoreUser = BigDecimal.ZERO;
-        int numTweetsUser = 0;
-
         for (Text value: values) { //Finds total value of bytes us$
-            BigDecimal tempScore = new BigDecimal(analyzeString(value.toString()));
-            totalScoreUser = totalScoreUser.add(tempScore);
-            numTweetsUser++;
+//	    String valueArr[] = (value.toString()).split("\t");
+//	    String tweet = valueArr[1];
+//          double tempScore = analyzeString(tweet);
+//          runningTotal += tempScore;
+//          numTweets++;
+	    context.write(value, new Text(""));
         }
-        runningTotal.add(totalScoreUser);
-        numTweets += numTweetsUser;
  }
 
     public double analyzeString(String str) {
-        double stringScore = 45.0;
+        double stringScore = 0.0;
         String[] strArr = str.replaceAll("[^a-zA-Z ]", "").toLowerCase().split(" ");
         for (String segment: strArr) {
             int hashedSeg = segment.hashCode();
@@ -64,10 +62,13 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
 
     @Override                                                    //Only prints$
      protected void cleanup(Context context) throws IOException, InterruptedException{
-	BigDecimal avg = runningTotal.divide(new BigDecimal(numTweets));
-	Text avgText = new Text(avg.toString());
-	Text runningTotalText = new Text(runningTotal.toString());
+	double avg = (runningTotal/(double)numTweets);
+	//BigDecimal avg = runningTotal.divide(new BigDecimal(numTweets));
+	Text avgText = new Text(String.valueOf(avg));
+	Text runningTotalText = new Text(String.valueOf(runningTotal));
 	Text numTweetsText = new Text(Integer.toString(numTweets));
-	context.write(numTweetsText,runningTotalText);
+	String outputString = "There were " + numTweets + " strings parsed, with a total score of " + runningTotal + "\nAverage: " + avg;
+	Text outputText = new Text(outputString);
+	context.write(outputText, outputText);
      }
 }
