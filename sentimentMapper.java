@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import org.apache.hadoop.io.FloatWritable;
@@ -13,9 +12,9 @@ public class sentimentMapper extends Mapper<LongWritable, Text, Text, Text> {
       String line = value.toString();
       String[] fields = line.split("\t");
       String twitterId = fields[0];
-      String tweet = fields[0];
+      String tweet = fields[1];
 
-      context.write(new Text(tweet), new Text(twitterId));
+      context.write(new Text(twitterId), new Text(tweet));
    }
 }
 

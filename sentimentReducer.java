@@ -37,12 +37,9 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
     public void reduce(Text key, Iterable < Text > values, Context context) throws IOException,
     InterruptedException {
         for (Text value: values) { //Finds total value of bytes us$
-//	    String valueArr[] = (value.toString()).split("\t");
-//	    String tweet = valueArr[1];
-//          double tempScore = analyzeString(tweet);
-//          runningTotal += tempScore;
-//          numTweets++;
-	    context.write(value, new Text(""));
+          double tempScore = analyzeString(value.toString());
+          runningTotal += tempScore;
+          numTweets++;
         }
  }
 
