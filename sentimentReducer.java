@@ -38,8 +38,10 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
     InterruptedException {
         for (Text value: values) { //Finds total value of bytes us$
           double tempScore = analyzeString(value.toString());
+	  if(tempScore != 0.0){
           runningTotal += tempScore;
           numTweets++;
+	}
         }
  }
 
