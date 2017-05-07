@@ -36,13 +36,20 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
     @Override
     public void reduce(Text key, Iterable < Text > values, Context context) throws IOException,
     InterruptedException {
+	double timeScore = 0.0;
+	int numScore = 0;
         for (Text value: values) { //Finds total value of bytes us$
           double tempScore = analyzeString(value.toString());
 	  if(tempScore != 0.0){
           runningTotal += tempScore;
           numTweets++;
+	  timeScore += tempScore;
+	  numScore++;
 	}
         }
+	double timeScoreAvg = timeScore/numScore;
+	context.write(new Text(key), new Text(Double.toString(timeScoreAvg)));
+
  }
 
     public double analyzeString(String str) {
@@ -66,8 +73,9 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
 	Text avgText = new Text(String.valueOf(avg));
 	Text runningTotalText = new Text(String.valueOf(runningTotal));
 	Text numTweetsText = new Text(Integer.toString(numTweets));
-	String outputString = "There were " + numTweets + " strings parsed, with a total score of " + runningTotal + "\nAverage: " + avg;
+	String outputString = "\nThere were " + numTweets + " strings parsed, with a total score of " + runningTotal + "\nAverage: " + avg;
+	Text blankText = new Text("");
 	Text outputText = new Text(outputString);
-	context.write(outputText, outputText);
+	context.write(outputText, blankText);
      }
 }
