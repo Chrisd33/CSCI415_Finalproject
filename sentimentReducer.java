@@ -14,7 +14,10 @@ import java.io.*;
 
 public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
     double runningTotal = 0.0;
+    int numPositive = 0;
+    int numNegative = 0;
     int numTweets = 0;
+    int numTweetsOverall = 0;
     Hashtable sentiTable = new Hashtable();
 
    @Override
@@ -45,7 +48,12 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
           numTweets++;
 	  timeScore += tempScore;
 	  numScore++;
+	  if(tempScore > 0)
+	    numPositive++;
+	  else if(tempScore < 0)
+	    numNegative++;
 	}
+	numTweetsOverall++;
         }
 	double timeScoreAvg = timeScore/numScore;
 	context.write(new Text(key), new Text(Double.toString(timeScoreAvg)));
@@ -66,16 +74,18 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
         return stringScore;
     }
 
-    @Override                                                    //Only prints$
+    @Override
      protected void cleanup(Context context) throws IOException, InterruptedException{
 	double avg = (runningTotal/(double)numTweets);
-	//BigDecimal avg = runningTotal.divide(new BigDecimal(numTweets));
 	Text avgText = new Text(String.valueOf(avg));
 	Text runningTotalText = new Text(String.valueOf(runningTotal));
 	Text numTweetsText = new Text(Integer.toString(numTweets));
 	String outputString = "\nThere were " + numTweets + " strings parsed, with a total score of " + runningTotal + "\nAverage: " + avg;
-	Text blankText = new Text("");
+	double percentPositive = 100* ((double)numPositive/(double)numTweets);
+	double percentNegative = 100.0 - percentPositive;
+	String posNegString = "\nOf the " + numTweets + " strings, " + numPositive + " were overall positive, and " + numNegative + " were overall negative\nThis means\n" + Math.floor(percentNegative) + "% were overall negative\n" + Math.floor(percentPositive) + "% were overall positive";
 	Text outputText = new Text(outputString);
-	context.write(outputText, blankText);
+	Text posNegText = new Text(posNegString);
+	context.write(outputText, posNegText);
      }
 }
