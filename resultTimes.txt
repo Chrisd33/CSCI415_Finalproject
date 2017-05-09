@@ -1,0 +1,18 @@
+Tweets: NumLines: 826,016
+
+Times for running serially:
+
+Time elapsed (seconds): 7.256778068
+Time elapsed (seconds): 7.361749442
+Time elapsed (seconds): 7.405558988
+Time elapsed (seconds): 7.441281231
+Time elapsed (seconds): 7.556357486
+
+Times in Hadoop (Seconds):
+
+8.809
+21.049
+9.131
+21.955
+22.228
+
