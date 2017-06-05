@@ -18,6 +18,10 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
     int numNegative = 0;
     int numTweets = 0;
     int numTweetsOverall = 0;
+    double lowestTweetScore = 0.0;
+    double highestTweetScore = 0.0;
+    String highestTweet;
+    String lowestTweet;
     Hashtable sentiTable = new Hashtable();
 
    @Override
@@ -41,13 +45,14 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
     InterruptedException {
 	double timeScore = 0.0;
 	int numScore = 0;
-        for (Text value: values) { //Finds total value of bytes us$
+        for (Text value: values) {
           double tempScore = analyzeString(value.toString());
 	  if(tempScore != 0.0){
           runningTotal += tempScore;
           numTweets++;
 	  timeScore += tempScore;
 	  numScore++;
+	  setScorePosition(value, tempScore);
 	  if(tempScore > 0)
 	    numPositive++;
 	  else if(tempScore < 0)
@@ -60,18 +65,32 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
 
  }
 
+    private void setScorePosition(Text textAnalyzed, double scoreAssigned) {
+	    if(scoreAssigned > highestTweetScore)
+	      {
+		highestTweetScore = scoreAssigned;
+		highestTweet = textAnalyzed.toString();
+	      }
+	    else if(scoreAssigned < lowestTweetScore)
+	    {
+		lowestTweetScore = scoreAssigned;
+		lowestTweet = textAnalyzed.toString();
+	    }
+}
     public double analyzeString(String str) {
         double stringScore = 0.0;
+	int numWordsInString = 0;
         String[] strArr = str.replaceAll("[^a-zA-Z ]", "").toLowerCase().split(" ");
         for (String segment: strArr) {
             int hashedSeg = segment.hashCode();
-
             if (sentiTable.containsKey(hashedSeg)) {
                 double value = (double) sentiTable.get(hashedSeg);
                 stringScore += value;
             }
+	    numWordsInString++;
         }
-        return stringScore;
+	double avg = stringScore / (double) numWordsInString;
+        return avg;
     }
 
     @Override
@@ -86,6 +105,11 @@ public class sentimentReducer extends Reducer < Text, Text, Text, Text > {
 	String posNegString = "\nOf the " + numTweets + " strings, " + numPositive + " were overall positive, and " + numNegative + " were overall negative\nThis means\n" + Math.floor(percentNegative) + "% were overall negative\n" + Math.floor(percentPositive) + "% were overall positive";
 	Text outputText = new Text(outputString);
 	Text posNegText = new Text(posNegString);
+	String highestOutput = "Highest tweet was: " + highestTweet + "\nwith a score of: " + highestTweetScore;
+	String lowestOutput = "\nLowest Tweet was: " + lowestTweet + "\n with a score of: " + lowestTweetScore;
+	Text highestOutputText = new Text(highestOutput);
+	Text lowestOutputText = new Text(lowestOutput);
+	context.write(highestOutputText, lowestOutputText);
 	context.write(outputText, posNegText);
      }
 }
